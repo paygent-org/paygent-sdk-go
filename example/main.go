@@ -9,7 +9,7 @@ import (
 
 func main() {
 	// Create a new client with custom base URL for localhost testing
-	client := paylm.NewClientWithURL("58afdf79b061daf9007ea23ad809f832bca4b4200fc59cd7623ed4578db47286", "http://localhost:8080")
+	client := paylm.NewClientWithURL("pk_e0ea0d11bb7f0d174caf578d665454acff97bdb1f85c235af547ccd9a733ef35", "http://localhost:8080")
 
 	// Set log level to see detailed logs
 	client.SetLogLevel(logrus.InfoLevel)

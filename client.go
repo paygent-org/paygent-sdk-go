@@ -525,7 +525,7 @@ func (c *Client) SendUsageWithTokenString(agentID, customerID, indicator string,
 	c.logger.Debugf("API request body: %s", string(requestBody))
 
 	// Create HTTP request
-	url := fmt.Sprintf("%s/v1/usage", c.baseURL)
+	url := fmt.Sprintf("%s/api/v1/usage", c.baseURL)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
 	if err != nil {
 		c.logger.Errorf("Failed to create HTTP request: %v", err)
