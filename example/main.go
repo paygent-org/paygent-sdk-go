@@ -14,11 +14,11 @@ func main() {
 	// Set log level to see detailed logs
 	client.SetLogLevel(logrus.InfoLevel)
 
-	// Example 1: Basic usage with Llama model
-	log.Println("=== Example 1: Llama Model ===")
+	// Example 1: Basic usage with Gemini model using constants
+	log.Println("=== Example 1: Gemini Model ===")
 	usageData1 := paylm.UsageData{
-		ServiceProvider:  "Meta",
-		Model:            "llama-3-8b",
+		ServiceProvider:  paylm.GoogleDeepMind,
+		Model:            paylm.Gemini25Flash,
 		PromptTokens:     756,
 		CompletionTokens: 244,
 		TotalTokens:      1000,
@@ -31,11 +31,11 @@ func main() {
 		log.Println("Usage data sent successfully!")
 	}
 
-	// Example 2: GPT-4 model
-	log.Println("\n=== Example 2: GPT-4 Model ===")
+	// Example 2: GPT-5 model using constants
+	log.Println("\n=== Example 2: GPT-5 Model ===")
 	usageData2 := paylm.UsageData{
-		ServiceProvider:  "OpenAI",
-		Model:            "gpt-4",
+		ServiceProvider:  paylm.OpenAI,
+		Model:            paylm.GPT5,
 		PromptTokens:     1000,
 		CompletionTokens: 500,
 		TotalTokens:      1500,
@@ -51,7 +51,7 @@ func main() {
 	// Example 3: Unknown model (will use default pricing)
 	log.Println("\n=== Example 3: Unknown Model ===")
 	usageData3 := paylm.UsageData{
-		ServiceProvider:  "Custom",
+		ServiceProvider:  paylm.Custom,
 		Model:            "custom-model",
 		PromptTokens:     200,
 		CompletionTokens: 100,
@@ -70,11 +70,11 @@ func main() {
 	logger := client.GetLogger()
 	logger.Info("This is a custom log message from the application")
 
-	// Example 5: SendUsageWithTokenString - using prompt and output strings
+	// Example 5: SendUsageWithTokenString - using prompt and output strings with constants
 	log.Println("\n=== Example 5: SendUsageWithTokenString ===")
 	usageDataWithStrings := paylm.UsageDataWithStrings{
-		ServiceProvider: "OpenAI",
-		Model:           "gpt-4",
+		ServiceProvider: paylm.OpenAI,
+		Model:           paylm.GPT4O,
 		PromptString:    "What is the capital of France? Please provide a detailed explanation.",
 		OutputString:    "The capital of France is Paris. Paris is located in the north-central part of France and is the country's largest city and economic center.",
 	}
@@ -89,10 +89,10 @@ func main() {
 	// Example 6: Different model providers
 	log.Println("\n=== Example 6: Different Model Providers ===")
 
-	// Anthropic Claude
+	// Anthropic Claude using constants
 	claudeUsage := paylm.UsageDataWithStrings{
-		ServiceProvider: "Anthropic",
-		Model:           "claude-3-sonnet",
+		ServiceProvider: paylm.Anthropic,
+		Model:           paylm.Sonnet45,
 		PromptString:    "Explain quantum computing in simple terms.",
 		OutputString:    "Quantum computing is a revolutionary approach to computation that leverages the principles of quantum mechanics to process information in ways that classical computers cannot.",
 	}
@@ -104,20 +104,20 @@ func main() {
 		log.Println("Claude usage data sent successfully!")
 	}
 
-	// GPT-5 example
-	log.Println("\n=== GPT-5 Example ===")
-	gpt5Usage := paylm.UsageDataWithStrings{
-		ServiceProvider: "OpenAI",
-		Model:           "gpt-5",
+	// AWS Nova example using constants
+	log.Println("\n=== AWS Nova Example ===")
+	novaUsage := paylm.UsageDataWithStrings{
+		ServiceProvider: paylm.AWS,
+		Model:           paylm.AmazonNovaLite,
 		PromptString:    "Analyze the following complex business scenario and provide strategic recommendations.",
 		OutputString:    "Based on the analysis, I recommend focusing on three key strategic areas: market expansion, operational efficiency, and customer retention.",
 	}
 
-	err = client.SendUsageWithTokenString("agent-101", "customer-202", "business-analysis", gpt5Usage)
+	err = client.SendUsageWithTokenString("agent-101", "customer-202", "business-analysis", novaUsage)
 	if err != nil {
-		log.Printf("Failed to send GPT-5 usage: %v", err)
+		log.Printf("Failed to send AWS Nova usage: %v", err)
 	} else {
-		log.Println("GPT-5 usage data sent successfully!")
+		log.Println("AWS Nova usage data sent successfully!")
 	}
 
 	// Example 7: Error handling

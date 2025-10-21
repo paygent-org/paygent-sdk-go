@@ -44,21 +44,21 @@ func TestCalculateCost(t *testing.T) {
 	}{
 		{
 			name:  "Llama model",
-			model: "llama",
+			model: Llama38BInstructLite,
 			usageData: UsageData{
 				PromptTokens:     1000,
 				CompletionTokens: 500,
 			},
-			expected: 0.15, // (1000 + 500) / 1000 * 0.1
+			expected: 0.0002, // 1000 * 0.0001 + 500 * 0.0001
 		},
 		{
 			name:  "GPT-4 model",
-			model: "gpt-4",
+			model: GPT4O,
 			usageData: UsageData{
 				PromptTokens:     1000,
 				CompletionTokens: 500,
 			},
-			expected: 60.0, // 1000 * 0.03 + 500 * 0.06
+			expected: 0.0075, // 1000 * 0.0025 + 500 * 0.01
 		},
 		{
 			name:  "Unknown model",

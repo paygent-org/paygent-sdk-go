@@ -10,6 +10,75 @@ go get github.com/paylm/paylm-sdk-go
 
 ## Usage
 
+### Model Constants
+
+The SDK provides constants for all supported model names to ensure type safety and avoid typos:
+
+```go
+import "github.com/paylm/paylm-sdk-go"
+
+// OpenAI Models
+paylm.GPT5
+paylm.GPT4O
+paylm.GPT35Turbo
+// ... and many more
+
+// Anthropic Models
+paylm.Sonnet45
+paylm.Haiku45
+paylm.Opus41
+// ... and more
+
+// Google DeepMind Models
+paylm.Gemini25Pro
+paylm.Gemini25Flash
+// ... and more
+
+// Meta Models
+paylm.Llama4Maverick
+paylm.Llama4Scout
+// ... and more
+
+// AWS Models
+paylm.AmazonNovaMicro
+paylm.AmazonNovaLite
+paylm.AmazonNovaPro
+
+// Mistral AI Models
+paylm.Mistral7BInstruct
+paylm.MistralLarge
+// ... and more
+
+// Cohere Models
+paylm.CommandR7B
+paylm.CommandR
+// ... and more
+
+// DeepSeek Models
+paylm.DeepSeekChat
+paylm.DeepSeekReasoner
+// ... and more
+```
+
+### Service Provider Constants
+
+The SDK also provides constants for service provider names:
+
+```go
+import "github.com/paylm/paylm-sdk-go"
+
+// Service Provider Constants
+paylm.OpenAI           // "OpenAI"
+paylm.Anthropic        // "Anthropic"
+paylm.GoogleDeepMind   // "Google DeepMind"
+paylm.Meta             // "Meta"
+paylm.AWS              // "AWS"
+paylm.MistralAI        // "Mistral AI"
+paylm.Cohere           // "Cohere"
+paylm.DeepSeek         // "DeepSeek"
+paylm.Custom           // "Custom"
+```
+
 ### Basic Usage
 
 ```go
@@ -27,10 +96,10 @@ func main() {
     // Set log level (optional)
     client.SetLogLevel(logrus.InfoLevel)
     
-    // Define usage data
+    // Define usage data using constants
     usageData := paylm.UsageData{
-        ServiceProvider:  "Meta",
-        Model:            "llama-3-8b",
+        ServiceProvider:  paylm.Meta,
+        Model:            paylm.Llama38BInstructLite,
         PromptTokens:     756,
         CompletionTokens: 244,
         TotalTokens:      1000,
@@ -62,10 +131,10 @@ func main() {
     client := paylm.NewClientWithURL("your-api-key", "http://localhost:8080")
     client.SetLogLevel(logrus.InfoLevel)
     
-    // Define usage data with prompt and output strings
+    // Define usage data with prompt and output strings using constants
     usageData := paylm.UsageDataWithStrings{
-        ServiceProvider: "OpenAI",
-        Model:           "gpt-4",
+        ServiceProvider: paylm.OpenAI,
+        Model:           paylm.GPT4O,
         PromptString:    "What is the capital of France? Please provide a detailed explanation.",
         OutputString:    "The capital of France is Paris. Paris is located in the north-central part of France and is the country's largest city and economic center.",
     }
@@ -170,25 +239,46 @@ type UsageDataWithStrings struct {
 The SDK includes built-in pricing for models from the following providers:
 
 ### OpenAI
-- `gpt-3.5-turbo` - $1.50 prompt, $2.00 completion (per 1000 tokens)
-- `gpt-3.5-turbo-16k` - $3.00 prompt, $4.00 completion (per 1000 tokens)
-- `gpt-4` - $30.00 prompt, $60.00 completion (per 1000 tokens)
-- `gpt-4-turbo` - $10.00 prompt, $30.00 completion (per 1000 tokens)
-- `gpt-4o` - $5.00 prompt, $15.00 completion (per 1000 tokens)
-- `gpt-4o-mini` - $0.15 prompt, $0.60 completion (per 1000 tokens)
-- `gpt-5` - $10.00 prompt, $30.00 completion (per 1000 tokens, estimated)
+- `gpt-5` - $0.00125 prompt, $0.01 completion (per 1000 tokens)
+- `gpt-5-mini` - $0.00025 prompt, $0.002 completion (per 1000 tokens)
+- `gpt-5-nano` - $0.00005 prompt, $0.0004 completion (per 1000 tokens)
+- `gpt-5-pro` - $0.015 prompt, $0.12 completion (per 1000 tokens)
+- `gpt-4.1` - $0.002 prompt, $0.008 completion (per 1000 tokens)
+- `gpt-4.1-mini` - $0.0004 prompt, $0.0016 completion (per 1000 tokens)
+- `gpt-4o` - $0.0025 prompt, $0.01 completion (per 1000 tokens)
+- `gpt-4o-mini` - $0.00015 prompt, $0.0006 completion (per 1000 tokens)
+- `o1` - $0.015 prompt, $0.06 completion (per 1000 tokens)
+- `o1-pro` - $0.15 prompt, $0.6 completion (per 1000 tokens)
+- `o3-pro` - $0.02 prompt, $0.08 completion (per 1000 tokens)
+- `o3` - $0.002 prompt, $0.008 completion (per 1000 tokens)
+- `gpt-3.5-turbo` - $0.0005 prompt, $0.0015 completion (per 1000 tokens)
+- `gpt-4-0613` - $0.03 prompt, $0.06 completion (per 1000 tokens)
+- `davinci-002` - $0.002 prompt, $0.002 completion (per 1000 tokens)
+- `babbage-002` - $0.0004 prompt, $0.0004 completion (per 1000 tokens)
+- *... and many more specialized models including realtime, audio, search, and preview variants*
 
 ### Anthropic
-- `claude-3-haiku` - $0.25 prompt, $1.25 completion (per 1000 tokens)
-- `claude-3-sonnet` - $3.00 prompt, $15.00 completion (per 1000 tokens)
-- `claude-3-opus` - $15.00 prompt, $75.00 completion (per 1000 tokens)
-- `claude-3.5-sonnet` - $3.00 prompt, $15.00 completion (per 1000 tokens)
+- `sonnet-4.5` - $0.003 prompt, $0.015 completion (per 1000 tokens)
+- `haiku-4.5` - $0.001 prompt, $0.005 completion (per 1000 tokens)
+- `opus-4.1` - $0.015 prompt, $0.075 completion (per 1000 tokens)
+- `sonnet-4` - $0.003 prompt, $0.015 completion (per 1000 tokens)
+- `opus-4` - $0.015 prompt, $0.075 completion (per 1000 tokens)
+- `sonnet-3.7` - $0.003 prompt, $0.015 completion (per 1000 tokens)
+- `haiku-3.5` - $0.0008 prompt, $0.004 completion (per 1000 tokens)
+- `opus-3` - $0.015 prompt, $0.075 completion (per 1000 tokens)
+- `haiku-3` - $0.00025 prompt, $0.00125 completion (per 1000 tokens)
 
 ### Google DeepMind
-- `gemini-pro` - $0.50 prompt, $1.50 completion (per 1000 tokens)
-- `gemini-pro-vision` - $0.50 prompt, $1.50 completion (per 1000 tokens)
-- `gemini-1.5-pro` - $1.25 prompt, $5.00 completion (per 1000 tokens)
-- `gemini-1.5-flash` - $0.075 prompt, $0.30 completion (per 1000 tokens)
+- `gemini-2.5-pro` - $0.00125 prompt, $0.01 completion (per 1000 tokens)
+- `gemini-2.5-flash` - $0.00015 prompt, $0.0006 completion (per 1000 tokens)
+- `gemini-2.5-flash-preview` - $0.30 prompt, $2.50 completion (per 1000 tokens)
+- `gemini-2.5-flash-lite` - $0.0001 prompt, $0.0004 completion (per 1000 tokens)
+- `gemini-2.5-flash-lite-preview` - $0.0001 prompt, $0.0004 completion (per 1000 tokens)
+- `gemini-2.5-flash-native-audio` - $0.0005 prompt, $0.002 completion (per 1000 tokens)
+- `gemini-2.5-flash-image` - $0.0003 prompt, $0.03 completion (per 1000 tokens)
+- `gemini-2.5-flash-preview-tts` - $0.0005 prompt, $0.01 completion (per 1000 tokens)
+- `gemini-2.5-pro-preview-tts` - $0.001 prompt, $0.02 completion (per 1000 tokens)
+- `gemini-2.5-computer-use-preview` - $0.00125 prompt, $0.01 completion (per 1000 tokens)
 
 ### Meta
 - `llama-2-7b` - $0.10 per 1000 tokens
@@ -198,26 +288,30 @@ The SDK includes built-in pricing for models from the following providers:
 - `llama-3-70b` - $0.70 per 1000 tokens
 
 ### AWS
-- `claude-3-haiku-aws` - $0.25 prompt, $1.25 completion (per 1000 tokens)
-- `claude-3-sonnet-aws` - $3.00 prompt, $15.00 completion (per 1000 tokens)
-- `titan-text-express` - $0.80 prompt, $1.60 completion (per 1000 tokens)
-- `titan-text-lite` - $0.30 prompt, $0.40 completion (per 1000 tokens)
+- `amazon-nova-micro` - $0.035 prompt, $0.14 completion (per 1000 tokens)
+- `amazon-nova-lite` - $0.06 prompt, $0.24 completion (per 1000 tokens)
+- `amazon-nova-pro` - $0.8 prompt, $3.2 completion (per 1000 tokens)
 
 ### Mistral AI
-- `mistral-7b` - $0.10 per 1000 tokens
-- `mistral-8x7b` - $0.20 per 1000 tokens
-- `mistral-nemo` - $0.10 per 1000 tokens
+- `mistral-7b-instruct` - $0.028 prompt, $0.054 completion (per 1000 tokens)
 - `mistral-large` - $2.00 prompt, $6.00 completion (per 1000 tokens)
+- `mistral-small` - $0.20 prompt, $0.60 completion (per 1000 tokens)
+- `mistral-medium` - $0.40 prompt, $2.00 completion (per 1000 tokens)
 
 ### Cohere
-- `command` - $1.50 prompt, $2.00 completion (per 1000 tokens)
-- `command-light` - $0.30 prompt, $0.60 completion (per 1000 tokens)
-- `command-r` - $0.50 prompt, $1.50 completion (per 1000 tokens)
-- `command-r-plus` - $3.00 prompt, $15.00 completion (per 1000 tokens)
+- `command-r7b` - $0.0000375 prompt, $0.00015 completion (per 1000 tokens)
+- `command-r` - $0.00015 prompt, $0.0006 completion (per 1000 tokens)
+- `command-r-plus` - $0.00250 prompt, $0.01 completion (per 1000 tokens)
+- `command-a` - $0.001 prompt, $0.002 completion (per 1000 tokens)
+- `aya-expanse-8b` - $0.00050 prompt, $0.00150 completion (per 1000 tokens)
+- `aya-expanse-32b` - $0.00050 prompt, $0.00150 completion (per 1000 tokens)
 
 ### DeepSeek
-- `deepseek-chat` - $0.10 prompt, $0.20 completion (per 1000 tokens)
-- `deepseek-coder` - $0.10 prompt, $0.20 completion (per 1000 tokens)
+- `deepseek-chat` - $0.00007 prompt, $0.00027 completion (per 1000 tokens)
+- `deepseek-reasoner` - $0.00014 prompt, $0.00219 completion (per 1000 tokens)
+- `deepseek-r1-global` - $0.00135 prompt, $0.0054 completion (per 1000 tokens)
+- `deepseek-r1-datazone` - $0.001485 prompt, $0.00594 completion (per 1000 tokens)
+- `deepseek-v3.2-exp` - $0.000028 prompt, $0.00042 completion (per 1000 tokens)
 
 For unknown models, the SDK will use default pricing of $0.10 per 1000 tokens.
 
