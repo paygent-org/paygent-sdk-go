@@ -494,7 +494,7 @@ func NewClient(apiKey string) *Client {
 
 	return &Client{
 		apiKey:  apiKey,
-		baseURL: "https://api.paylm.com", // Replace with actual API URL
+		baseURL: "http://13.201.118.45:8080",
 		httpClient: &http.Client{
 			Timeout: 30 * time.Second,
 		},
