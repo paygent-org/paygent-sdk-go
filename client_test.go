@@ -1,4 +1,4 @@
-package paylm
+package paygent
 
 import (
 	"testing"
@@ -14,13 +14,13 @@ func TestNewClient(t *testing.T) {
 	if client.apiKey != "test-api-key" {
 		t.Errorf("Expected apiKey to be 'test-api-key', got '%s'", client.apiKey)
 	}
-	if client.baseURL != "https://api.paylm.com" {
-		t.Errorf("Expected baseURL to be 'https://api.paylm.com', got '%s'", client.baseURL)
+	if client.baseURL != "http://13.201.118.45:8080" {
+		t.Errorf("Expected baseURL to be 'http://13.201.118.45:8080', got '%s'", client.baseURL)
 	}
 }
 
 func TestNewClientWithURL(t *testing.T) {
-	customURL := "https://custom-api.paylm.com"
+	customURL := "https://custom-api.paygent.com"
 	client := NewClientWithURL("test-api-key", customURL)
 	if client == nil {
 		t.Fatal("Expected client to be created")
