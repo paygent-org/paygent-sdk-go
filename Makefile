@@ -2,7 +2,7 @@
 
 # Build the SDK
 build:
-	go build -o bin/paylm-sdk-go .
+	go build -o bin/paygent-sdk-go .
 
 # Run tests
 test:

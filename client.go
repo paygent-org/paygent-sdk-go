@@ -1,4 +1,4 @@
-package paylm
+package paygent
 
 import (
 	"bytes"
@@ -13,7 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Client represents the Paylm SDK client
+// Client represents the Paygent SDK client
 type Client struct {
 	apiKey     string
 	baseURL    string
@@ -487,7 +487,7 @@ var modelPricing = map[string]ModelPricing{
 	},
 }
 
-// NewClient creates a new Paylm SDK client
+// NewClient creates a new Paygent SDK client
 func NewClient(apiKey string) *Client {
 	logger := logrus.New()
 	logger.SetLevel(logrus.InfoLevel)
@@ -502,7 +502,7 @@ func NewClient(apiKey string) *Client {
 	}
 }
 
-// NewClientWithURL creates a new Paylm SDK client with custom base URL
+// NewClientWithURL creates a new Paygent SDK client with custom base URL
 func NewClientWithURL(apiKey, baseURL string) *Client {
 	logger := logrus.New()
 	logger.SetLevel(logrus.InfoLevel)
@@ -683,7 +683,7 @@ func (c *Client) calculateCostFromStrings(model string, usageData UsageDataWithS
 	return totalCost, nil
 }
 
-// SendUsage sends usage data to the Paylm API
+// SendUsage sends usage data to the Paygent API
 func (c *Client) SendUsage(agentID, customerID, indicator string, usageData UsageData) error {
 	c.logger.Infof("Starting sendUsage for agentID=%s, customerID=%s, indicator=%s, model=%s",
 		agentID, customerID, indicator, usageData.Model)
@@ -728,7 +728,7 @@ func (c *Client) SendUsage(agentID, customerID, indicator string, usageData Usag
 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("paylm-api-key", c.apiKey)
+	req.Header.Set("paygent-api-key", c.apiKey)
 
 	c.logger.Debugf("Making HTTP POST request to: %s", url)
 
@@ -761,7 +761,7 @@ func (c *Client) SendUsage(agentID, customerID, indicator string, usageData Usag
 	return fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(responseBody))
 }
 
-// SendUsageWithTokenString sends usage data to the Paylm API using prompt and output strings
+// SendUsageWithTokenString sends usage data to the Paygent API using prompt and output strings
 func (c *Client) SendUsageWithTokenString(agentID, customerID, indicator string, usageData UsageDataWithStrings) error {
 	c.logger.Infof("Starting sendUsageWithTokenString for agentID=%s, customerID=%s, indicator=%s, serviceProvider=%s, model=%s",
 		agentID, customerID, indicator, usageData.ServiceProvider, usageData.Model)
@@ -810,7 +810,7 @@ func (c *Client) SendUsageWithTokenString(agentID, customerID, indicator string,
 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("paylm-api-key", c.apiKey)
+	req.Header.Set("paygent-api-key", c.apiKey)
 
 	c.logger.Debugf("Making HTTP POST request to: %s", url)
 

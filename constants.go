@@ -1,4 +1,4 @@
-package paylm
+package paygent
 
 // Model name constants for external access
 const (

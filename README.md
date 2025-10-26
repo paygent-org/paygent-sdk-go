@@ -1,11 +1,11 @@
-# Paylm SDK for Go
+# Paygent SDK for Go
 
-A Go SDK for integrating with the Paylm API to track usage and costs for AI models.
+A Go SDK for integrating with the Paygent API to track usage and costs for AI models.
 
 ## Installation
 
 ```bash
-go get github.com/paylm/paylm-sdk-go
+go get github.com/paygent/paygent-sdk-go
 ```
 
 ## Usage
@@ -15,48 +15,48 @@ go get github.com/paylm/paylm-sdk-go
 The SDK provides constants for all supported model names to ensure type safety and avoid typos:
 
 ```go
-import "github.com/paylm/paylm-sdk-go"
+import "github.com/paygent/paygent-sdk-go"
 
 // OpenAI Models
-paylm.GPT5
-paylm.GPT4O
-paylm.GPT35Turbo
+paygent.GPT5
+paygent.GPT4O
+paygent.GPT35Turbo
 // ... and many more
 
 // Anthropic Models
-paylm.Sonnet45
-paylm.Haiku45
-paylm.Opus41
+paygent.Sonnet45
+paygent.Haiku45
+paygent.Opus41
 // ... and more
 
 // Google DeepMind Models
-paylm.Gemini25Pro
-paylm.Gemini25Flash
+paygent.Gemini25Pro
+paygent.Gemini25Flash
 // ... and more
 
 // Meta Models
-paylm.Llama4Maverick
-paylm.Llama4Scout
+paygent.Llama4Maverick
+paygent.Llama4Scout
 // ... and more
 
 // AWS Models
-paylm.AmazonNovaMicro
-paylm.AmazonNovaLite
-paylm.AmazonNovaPro
+paygent.AmazonNovaMicro
+paygent.AmazonNovaLite
+paygent.AmazonNovaPro
 
 // Mistral AI Models
-paylm.Mistral7BInstruct
-paylm.MistralLarge
+paygent.Mistral7BInstruct
+paygent.MistralLarge
 // ... and more
 
 // Cohere Models
-paylm.CommandR7B
-paylm.CommandR
+paygent.CommandR7B
+paygent.CommandR
 // ... and more
 
 // DeepSeek Models
-paylm.DeepSeekChat
-paylm.DeepSeekReasoner
+paygent.DeepSeekChat
+paygent.DeepSeekReasoner
 // ... and more
 ```
 
@@ -65,18 +65,18 @@ paylm.DeepSeekReasoner
 The SDK also provides constants for service provider names:
 
 ```go
-import "github.com/paylm/paylm-sdk-go"
+import "github.com/paygent/paygent-sdk-go"
 
 // Service Provider Constants
-paylm.OpenAI           // "OpenAI"
-paylm.Anthropic        // "Anthropic"
-paylm.GoogleDeepMind   // "Google DeepMind"
-paylm.Meta             // "Meta"
-paylm.AWS              // "AWS"
-paylm.MistralAI        // "Mistral AI"
-paylm.Cohere           // "Cohere"
-paylm.DeepSeek         // "DeepSeek"
-paylm.Custom           // "Custom"
+paygent.OpenAI           // "OpenAI"
+paygent.Anthropic        // "Anthropic"
+paygent.GoogleDeepMind   // "Google DeepMind"
+paygent.Meta             // "Meta"
+paygent.AWS              // "AWS"
+paygent.MistralAI        // "Mistral AI"
+paygent.Cohere           // "Cohere"
+paygent.DeepSeek         // "DeepSeek"
+paygent.Custom           // "Custom"
 ```
 
 ### Basic Usage
@@ -86,20 +86,20 @@ package main
 
 import (
     "log"
-    "github.com/paylm/paylm-sdk-go"
+    "github.com/paygent/paygent-sdk-go"
 )
 
 func main() {
     // Create a new client with your API key
-    client := paylm.NewClient("your-paylm-api-key")
+    client := paygent.NewClient("your-paygent-api-key")
     
     // Set log level (optional)
     client.SetLogLevel(logrus.InfoLevel)
     
     // Define usage data using constants
-    usageData := paylm.UsageData{
-        ServiceProvider:  paylm.Meta,
-        Model:            paylm.Llama38BInstructLite,
+    usageData := paygent.UsageData{
+        ServiceProvider:  paygent.Meta,
+        Model:            paygent.Llama38BInstructLite,
         PromptTokens:     756,
         CompletionTokens: 244,
         TotalTokens:      1000,
@@ -122,19 +122,19 @@ package main
 
 import (
     "log"
-    "github.com/paylm/paylm-sdk-go"
+    "github.com/paygent/paygent-sdk-go"
     "github.com/sirupsen/logrus"
 )
 
 func main() {
     // Create a new client
-    client := paylm.NewClientWithURL("your-api-key", "http://localhost:8080")
+    client := paygent.NewClientWithURL("your-api-key", "http://localhost:8080")
     client.SetLogLevel(logrus.InfoLevel)
     
     // Define usage data with prompt and output strings using constants
-    usageData := paylm.UsageDataWithStrings{
-        ServiceProvider: paylm.OpenAI,
-        Model:           paylm.GPT4O,
+    usageData := paygent.UsageDataWithStrings{
+        ServiceProvider: paygent.OpenAI,
+        Model:           paygent.GPT4O,
         PromptString:    "What is the capital of France? Please provide a detailed explanation.",
         OutputString:    "The capital of France is Paris. Paris is located in the north-central part of France and is the country's largest city and economic center.",
     }
@@ -156,13 +156,13 @@ package main
 
 import (
     "log"
-    "github.com/paylm/paylm-sdk-go"
+    "github.com/paygent/paygent-sdk-go"
     "github.com/sirupsen/logrus"
 )
 
 func main() {
     // Create client with custom base URL
-    client := paylm.NewClientWithURL("your-api-key", "https://custom-api.paylm.com")
+    client := paygent.NewClientWithURL("your-api-key", "https://custom-api.paygent.com")
     
     // Set debug logging
     client.SetLogLevel(logrus.DebugLevel)
@@ -172,7 +172,7 @@ func main() {
     logger.Info("Starting usage tracking...")
     
     // Send usage data
-    usageData := paylm.UsageData{
+    usageData := paygent.UsageData{
         Model:            "gpt-4",
         PromptTokens:     1000,
         CompletionTokens: 500,
@@ -194,16 +194,16 @@ func main() {
 ### Client
 
 #### `NewClient(apiKey string) *Client`
-Creates a new Paylm SDK client with the default API URL.
+Creates a new Paygent SDK client with the default API URL.
 
 #### `NewClientWithURL(apiKey, baseURL string) *Client`
-Creates a new Paylm SDK client with a custom base URL.
+Creates a new Paygent SDK client with a custom base URL.
 
 #### `SendUsage(agentID, customerID, indicator string, usageData UsageData) error`
-Sends usage data to the Paylm API. Returns an error if the request fails.
+Sends usage data to the Paygent API. Returns an error if the request fails.
 
 #### `SendUsageWithTokenString(agentID, customerID, indicator string, usageData UsageDataWithStrings) error`
-Sends usage data to the Paylm API using prompt and output strings. The function automatically counts tokens using proper tokenizers for each model provider and calculates costs. Returns an error if the request fails.
+Sends usage data to the Paygent API using prompt and output strings. The function automatically counts tokens using proper tokenizers for each model provider and calculates costs. Returns an error if the request fails.
 
 #### `SetLogLevel(level logrus.Level)`
 Sets the logging level for the client.
@@ -351,7 +351,7 @@ Both `SendUsage` and `SendUsageWithTokenString` functions send HTTP POST request
 **Headers:**
 ```
 Content-Type: application/json
-paylm-api-key: your-api-key
+paygent-api-key: your-api-key
 ```
 
 ## Logging

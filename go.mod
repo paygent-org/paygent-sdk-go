@@ -1,4 +1,4 @@
-module github.com/paylm/paylm-sdk-go
+module github.com/paygent/paygent-sdk-go
 
 go 1.21
 
