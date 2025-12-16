@@ -120,6 +120,54 @@ const (
 	DeepSeekR1Global   = "DeepSeek R1 Global"
 	DeepSeekR1DataZone = "DeepSeek R1 DataZone"
 	DeepSeekV32Exp     = "DeepSeek V3.2-Exp"
+
+	// Deepgram STT Models
+	DeepgramFlux               = "Flux"
+	DeepgramNova3Monolingual   = "Nova-3 (Monolingual)"
+	DeepgramNova3Multilingual  = "Nova-3 (Multilingual)"
+	DeepgramNova1              = "Nova-1"
+	DeepgramNova2              = "Nova-2"
+	DeepgramEnhanced           = "Enhanced"
+	DeepgramBase               = "Base"
+	DeepgramRedaction          = "Redaction (Add-on)"
+	DeepgramKeytermPrompting   = "Keyterm Prompting (Add-on)"
+	DeepgramSpeakerDiarization = "Speaker Diarization (Add-on)"
+
+	// Microsoft Azure Speech Service STT Models
+	AzureSpeechStandard = "Azure Speech Standard"
+	AzureSpeechCustom   = "Azure Speech Custom"
+
+	// Google Cloud Speech-to-Text STT Models
+	GoogleCloudSpeechStandard = "Google Cloud Speech Standard"
+
+	// AssemblyAI STT Models
+	AssemblyAIUniversalStreaming          = "Universal-Streaming"
+	AssemblyAIUniversalStreamingMultilang = "Universal-Streaming Multilingual"
+	AssemblyAIKeytermsPrompting           = "Keyterms Prompting"
+
+	// Amazon Polly TTS Models
+	PollyStandard   = "Amazon Polly Standard"
+	PollyNeural     = "Amazon Polly Neural"
+	PollyLongForm   = "Amazon Polly Long-form"
+	PollyGenerative = "Amazon Polly Generative"
+
+	// Microsoft Azure Speech Service TTS Models
+	AzureTtsStandard       = "Azure TTS Standard"
+	AzureTtsCustom         = "Azure TTS Custom"
+	AzureTtsCustomNeuralHD = "Azure TTS Custom Neural HD"
+
+	// Google Cloud Text-to-Speech TTS Models
+	GoogleCloudTtsChirp3HD        = "Google Cloud TTS Chirp 3: HD"
+	GoogleCloudTtsInstantCustom   = "Google Cloud TTS Instant custom"
+	GoogleCloudTtsWaveNet         = "Google Cloud TTS WaveNet"
+	GoogleCloudTtsStudio          = "Google Cloud TTS Studio"
+	GoogleCloudTtsStandard        = "Google Cloud TTS Standard"
+	GoogleCloudTtsNeural2         = "Google Cloud TTS Neural2"
+	GoogleCloudTtsPolyglotPreview = "Google Cloud TTS Polyglot (Preview)"
+
+	// Deepgram TTS Models
+	DeepgramAura2 = "Deepgram Aura-2"
+	DeepgramAura1 = "Deepgram Aura-1"
 )
 
 // Service provider constants for external access
@@ -134,4 +182,16 @@ const (
 	Cohere         = "Cohere"
 	DeepSeek       = "DeepSeek"
 	Custom         = "Custom"
+
+	// STT Service Providers
+	Deepgram             = "Deepgram"
+	MicrosoftAzureSpeech = "Microsoft Azure Speech Service"
+	GoogleCloudSpeech    = "Google Cloud Speech-to-Text"
+	AssemblyAI           = "AssemblyAI"
+
+	// TTS Service Providers
+	AmazonPolly             = "Amazon Polly"
+	MicrosoftAzureSpeechTTS = "Microsoft Azure Speech Service"
+	GoogleCloudTextToSpeech = "Google Cloud Text-to-Speech"
+	DeepgramTTS             = "Deepgram"
 )
