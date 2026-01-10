@@ -156,7 +156,7 @@ func (c *Client) SendSttUsage(agentID, customerID string, sttUsageData SttUsageD
 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("paylm-api-key", c.apiKey)
+	req.Header.Set("paygent-api-key", c.apiKey)
 
 	c.logger.Debugf("Making HTTP POST request to: %s", url)
 
@@ -337,7 +337,7 @@ func (c *Client) SendTtsUsage(agentID, customerID string, ttsUsageData TtsUsageD
 
 	// Set headers
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("paylm-api-key", c.apiKey)
+	req.Header.Set("paygent-api-key", c.apiKey)
 
 	c.logger.Debugf("Making HTTP POST request to: %s", url)
 
