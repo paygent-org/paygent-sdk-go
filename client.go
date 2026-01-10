@@ -487,33 +487,24 @@ var modelPricing = map[string]ModelPricing{
 	},
 }
 
+// SDK configuration constants - locked and cannot be changed by users
+const (
+	defaultBaseURL = "https://cp-api.withpaygent.com"
+	// defaultBaseURL = "http://localhost:8082" // For local development
+	defaultTimeout = 30 * time.Second
+)
+
 // NewClient creates a new Paygent SDK client
 func NewClient(apiKey string) *Client {
 	logger := logrus.New()
-	logger.SetLevel(logrus.InfoLevel)
+	// Set to ERROR level for minimal logging - only log errors
+	logger.SetLevel(logrus.ErrorLevel)
 
 	return &Client{
-		apiKey:  apiKey,
-		baseURL: "http://13.201.118.45:8080",
-		httpClient: &http.Client{
-			Timeout: 30 * time.Second,
-		},
-		logger: logger,
-	}
-}
-
-// NewClientWithURL creates a new Paygent SDK client with custom base URL
-func NewClientWithURL(apiKey, baseURL string) *Client {
-	logger := logrus.New()
-	logger.SetLevel(logrus.InfoLevel)
-
-	return &Client{
-		apiKey:  apiKey,
-		baseURL: baseURL,
-		httpClient: &http.Client{
-			Timeout: 30 * time.Second,
-		},
-		logger: logger,
+		apiKey:     apiKey,
+		baseURL:    defaultBaseURL,    // Locked configuration
+		httpClient: &http.Client{Timeout: defaultTimeout}, // Locked timeout
+		logger:     logger,
 	}
 }
 
@@ -685,8 +676,7 @@ func (c *Client) calculateCostFromStrings(model string, usageData UsageDataWithS
 
 // SendUsage sends usage data to the Paygent API
 func (c *Client) SendUsage(agentID, customerID, indicator string, usageData UsageData) error {
-	c.logger.Infof("Starting sendUsage for agentID=%s, customerID=%s, indicator=%s, model=%s",
-		agentID, customerID, indicator, usageData.Model)
+	// Removed verbose logging - only log errors
 
 	// Calculate cost
 	cost, err := c.calculateCost(usageData.Model, usageData)
@@ -695,7 +685,7 @@ func (c *Client) SendUsage(agentID, customerID, indicator string, usageData Usag
 		return fmt.Errorf("failed to calculate cost: %w", err)
 	}
 
-	c.logger.Infof("Calculated cost: %.6f for model %s", cost, usageData.Model)
+	// Cost calculated (no logging for performance)
 
 	// Prepare API request
 	apiRequest := APIRequest{
@@ -751,8 +741,7 @@ func (c *Client) SendUsage(agentID, customerID, indicator string, usageData Usag
 
 	// Check response status
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		c.logger.Infof("Successfully sent usage data for agentID=%s, customerID=%s, cost=%.6f",
-			agentID, customerID, cost)
+		// Success - no logging to minimize verbosity
 		return nil
 	}
 
@@ -763,8 +752,7 @@ func (c *Client) SendUsage(agentID, customerID, indicator string, usageData Usag
 
 // SendUsageWithTokenString sends usage data to the Paygent API using prompt and output strings
 func (c *Client) SendUsageWithTokenString(agentID, customerID, indicator string, usageData UsageDataWithStrings) error {
-	c.logger.Infof("Starting sendUsageWithTokenString for agentID=%s, customerID=%s, indicator=%s, serviceProvider=%s, model=%s",
-		agentID, customerID, indicator, usageData.ServiceProvider, usageData.Model)
+	// Removed verbose logging - only log errors
 
 	// Calculate cost from strings
 	cost, err := c.calculateCostFromStrings(usageData.Model, usageData)
@@ -773,7 +761,7 @@ func (c *Client) SendUsageWithTokenString(agentID, customerID, indicator string,
 		return fmt.Errorf("failed to calculate cost from strings: %w", err)
 	}
 
-	c.logger.Infof("Calculated cost: %.6f for model %s from strings", cost, usageData.Model)
+	// Cost calculated from strings (no logging for performance)
 
 	// Count tokens from strings using proper tokenization
 	promptTokens := c.getTokenCount(usageData.Model, usageData.PromptString)
@@ -833,8 +821,7 @@ func (c *Client) SendUsageWithTokenString(agentID, customerID, indicator string,
 
 	// Check response status
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		c.logger.Infof("Successfully sent usage data from strings for agentID=%s, customerID=%s, cost=%.6f",
-			agentID, customerID, cost)
+		// Success - no logging to minimize verbosity
 		return nil
 	}
 
