@@ -3,7 +3,7 @@ package main
 import (
 	"log"
 
-	"github.com/paygent/paygent-sdk-go"
+	"github.com/paygent-org/paygent-sdk-go"
 	"github.com/sirupsen/logrus"
 )
 

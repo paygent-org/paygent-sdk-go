@@ -1,4 +1,4 @@
-package integrations
+package anthropic
 
 import (
 	"context"
@@ -93,8 +93,14 @@ func (p *PaygentAnthropic) CreateMessage(ctx context.Context, params MessagePara
 		promptString, _ := json.Marshal(params.Messages)
 		outputString := ""
 		if len(resp.Content) > 0 {
-			if textBlock, ok := resp.Content[0].AsUnion().(anthropic.TextBlock); ok {
-				outputString = textBlock.Text
+			// Handle the content block properly
+			switch content := resp.Content[0].(type) {
+			case anthropic.TextBlock:
+				outputString = content.Text
+			case anthropic.ContentBlock:
+				if content.Type == anthropic.ContentBlockTypeText {
+					outputString = content.Text
+				}
 			}
 		}
 

@@ -5,7 +5,7 @@ A Go SDK for integrating with the Paygent API to track usage and costs for AI mo
 ## Installation
 
 ```bash
-go get github.com/paygent/paygent-sdk-go
+go get github.com/paygent-org/paygent-sdk-go
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ go get github.com/paygent/paygent-sdk-go
 The SDK provides constants for all supported model names to ensure type safety and avoid typos:
 
 ```go
-import "github.com/paygent/paygent-sdk-go"
+import "github.com/paygent-org/paygent-sdk-go"
 
 // OpenAI Models
 paygent.GPT5
@@ -65,7 +65,7 @@ paygent.DeepSeekReasoner
 The SDK also provides constants for service provider names:
 
 ```go
-import "github.com/paygent/paygent-sdk-go"
+import "github.com/paygent-org/paygent-sdk-go"
 
 // Service Provider Constants
 paygent.OpenAI           // "OpenAI"
@@ -86,7 +86,7 @@ package main
 
 import (
     "log"
-    "github.com/paygent/paygent-sdk-go"
+    "github.com/paygent-org/paygent-sdk-go"
 )
 
 func main() {
@@ -122,7 +122,7 @@ package main
 
 import (
     "log"
-    "github.com/paygent/paygent-sdk-go"
+    "github.com/paygent-org/paygent-sdk-go"
     "github.com/sirupsen/logrus"
 )
 
@@ -156,7 +156,7 @@ package main
 
 import (
     "log"
-    "github.com/paygent/paygent-sdk-go"
+    "github.com/paygent-org/paygent-sdk-go"
     "github.com/sirupsen/logrus"
 )
 
