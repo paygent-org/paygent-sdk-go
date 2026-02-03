@@ -94,7 +94,7 @@ func (p *PaygentGemini) GenerateContent(ctx context.Context, params GeminiGenera
 	if hasValidUsage {
 		// Primary path: Use usage metadata from API response
 		usageData := paygent.UsageData{
-			ServiceProvider:  params.Model,
+			ServiceProvider:  paygent.GoogleDeepMind,
 			Model:            params.Model,
 			PromptTokens:     int(resp.UsageMetadata.PromptTokenCount),
 			CompletionTokens: int(resp.UsageMetadata.CandidatesTokenCount),
@@ -123,7 +123,7 @@ func (p *PaygentGemini) GenerateContent(ctx context.Context, params GeminiGenera
 		}
 
 		usageDataWithStrings := paygent.UsageDataWithStrings{
-			ServiceProvider: params.Model,
+			ServiceProvider: paygent.GoogleDeepMind,
 			Model:           params.Model,
 			PromptString:    string(promptString),
 			OutputString:    outputString,
@@ -184,7 +184,7 @@ func (c *PaygentGeminiChat) SendMessage(ctx context.Context, parts ...genai.Part
 	if hasValidUsage {
 		// Primary path: Use usage metadata from API response
 		usageData := paygent.UsageData{
-			ServiceProvider:  c.model,
+			ServiceProvider:  paygent.GoogleDeepMind,
 			Model:            c.model,
 			PromptTokens:     int(resp.UsageMetadata.PromptTokenCount),
 			CompletionTokens: int(resp.UsageMetadata.CandidatesTokenCount),
@@ -213,7 +213,7 @@ func (c *PaygentGeminiChat) SendMessage(ctx context.Context, parts ...genai.Part
 		}
 
 		usageDataWithStrings := paygent.UsageDataWithStrings{
-			ServiceProvider: c.model,
+			ServiceProvider: paygent.GoogleDeepMind,
 			Model:           c.model,
 			PromptString:    string(promptString),
 			OutputString:    outputString,
