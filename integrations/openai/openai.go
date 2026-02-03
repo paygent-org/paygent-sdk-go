@@ -118,7 +118,7 @@ func (p *PaygentOpenAI) CreateChatCompletion(ctx context.Context, params ChatCom
 	if hasValidUsage {
 		// Primary path: Use usage data from API response
 		usageData := paygent.UsageData{
-			ServiceProvider:  params.Model,
+			ServiceProvider:  paygent.OpenAI,
 			Model:            params.Model,
 			PromptTokens:     resp.Usage.PromptTokens,
 			CompletionTokens: resp.Usage.CompletionTokens,
@@ -145,7 +145,7 @@ func (p *PaygentOpenAI) CreateChatCompletion(ctx context.Context, params ChatCom
 		}
 
 		usageDataWithStrings := paygent.UsageDataWithStrings{
-			ServiceProvider: params.Model,
+			ServiceProvider: paygent.OpenAI,
 			Model:           params.Model,
 			PromptString:    string(promptString),
 			OutputString:    outputString,
@@ -195,7 +195,7 @@ func (p *PaygentOpenAI) CreateEmbedding(ctx context.Context, model string, input
 	if hasValidUsage {
 		// Primary path: Use usage data from API response
 		usageData := paygent.UsageData{
-			ServiceProvider:  model,
+			ServiceProvider:  paygent.OpenAI,
 			Model:            model,
 			PromptTokens:     resp.Usage.PromptTokens,
 			CompletionTokens: resp.Usage.PromptTokens, // Embeddings don't have completion tokens
@@ -224,7 +224,7 @@ func (p *PaygentOpenAI) CreateEmbedding(ctx context.Context, model string, input
 		}
 
 		usageDataWithStrings := paygent.UsageDataWithStrings{
-			ServiceProvider: model,
+			ServiceProvider: paygent.OpenAI,
 			Model:           model,
 			PromptString:    inputText,
 			OutputString:    "", // Embeddings don't have output

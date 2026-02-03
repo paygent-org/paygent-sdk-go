@@ -2,7 +2,6 @@ package langchain
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/paygent-org/paygent-sdk-go"
@@ -47,15 +46,15 @@ func NewPaygentLangChainCallback(
 func (c *PaygentLangChainCallback) extractProvider(modelType string) string {
 	switch modelType {
 	case "openai", "openai-chat":
-		return "openai"
+		return paygent.OpenAI
 	case "anthropic":
-		return "anthropic"
+		return paygent.Anthropic
 	case "mistral":
-		return "mistral"
+		return paygent.MistralAI
 	case "google", "gemini":
-		return "gemini"
+		return paygent.GoogleDeepMind
 	case "cohere":
-		return "cohere"
+		return paygent.Cohere
 	default:
 		return "unknown"
 	}
@@ -97,13 +96,13 @@ func (c *PaygentLangChainCallback) HandleLLMGenerateContentEnd(ctx context.Conte
 	if modelName != "unknown" {
 		switch {
 		case strings.Contains(strings.ToLower(modelName), "gpt"):
-			provider = "openai"
+			provider = paygent.OpenAI
 		case strings.Contains(strings.ToLower(modelName), "claude"):
-			provider = "anthropic"
+			provider = paygent.Anthropic
 		case strings.Contains(strings.ToLower(modelName), "mistral"):
-			provider = "mistral"
+			provider = paygent.MistralAI
 		case strings.Contains(strings.ToLower(modelName), "gemini"):
-			provider = "gemini"
+			provider = paygent.GoogleDeepMind
 		}
 	}
 
@@ -212,7 +211,7 @@ func (c *PaygentLangChainCallback) HandleLLMGenerateContentEnd(ctx context.Conte
 
 // HandleLLMError is called when an LLM encounters an error
 func (c *PaygentLangChainCallback) HandleLLMError(ctx context.Context, err error) {
-	fmt.Printf("LLM error: %v\n", err)
+	c.paygentClient.GetLogger().Errorf("LLM error: %v", err)
 }
 
 // HandleChainStart is called when a chain starts

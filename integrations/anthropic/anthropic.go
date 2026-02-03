@@ -28,7 +28,7 @@ type MessageParams struct {
 	TopK                 *int
 	StopSequences        []string
 	Metadata             *anthropic.MetadataParam
-	ToolChoice           *anthropic.ToolChoiceParam
+	ToolChoice           anthropic.ToolChoiceUnionParam
 	Tools                []anthropic.ToolParam
 }
 
@@ -44,9 +44,9 @@ func NewPaygentAnthropic(client *anthropic.Client, paygentClient *paygent.Client
 func (p *PaygentAnthropic) CreateMessage(ctx context.Context, params MessageParams) (*anthropic.Message, error) {
 	// Build Anthropic request
 	reqParams := anthropic.MessageNewParams{
-		Model:     anthropic.F(params.Model),
-		Messages:  anthropic.F(params.Messages),
-		MaxTokens: anthropic.Int(int64(params.MaxTokens)),
+		Model:     anthropic.Model(params.Model),
+		Messages:  params.Messages,
+		MaxTokens: int64(params.MaxTokens),
 	}
 
 	// Add optional parameters
@@ -57,7 +57,7 @@ func (p *PaygentAnthropic) CreateMessage(ctx context.Context, params MessagePara
 		reqParams.TopP = anthropic.Float(*params.TopP)
 	}
 	if len(params.StopSequences) > 0 {
-		reqParams.StopSequences = anthropic.F(params.StopSequences)
+		reqParams.StopSequences = params.StopSequences
 	}
 
 	// Make Anthropic API call
@@ -72,7 +72,7 @@ func (p *PaygentAnthropic) CreateMessage(ctx context.Context, params MessagePara
 	if hasValidUsage {
 		// Primary path: Use usage data from API response
 		usageData := paygent.UsageData{
-			ServiceProvider:  params.Model,
+			ServiceProvider:  paygent.Anthropic,
 			Model:            params.Model,
 			PromptTokens:     int(resp.Usage.InputTokens),
 			CompletionTokens: int(resp.Usage.OutputTokens),
@@ -93,19 +93,17 @@ func (p *PaygentAnthropic) CreateMessage(ctx context.Context, params MessagePara
 		promptString, _ := json.Marshal(params.Messages)
 		outputString := ""
 		if len(resp.Content) > 0 {
-			// Handle the content block properly
-			switch content := resp.Content[0].(type) {
-			case anthropic.TextBlock:
+			// Handle the content block properly using the new structure
+			content := resp.Content[0]
+			if content.Type == "text" {
 				outputString = content.Text
-			case anthropic.ContentBlock:
-				if content.Type == anthropic.ContentBlockTypeText {
-					outputString = content.Text
-				}
+			} else if content.Type == "thinking" {
+				outputString = content.Thinking
 			}
 		}
 
 		usageDataWithStrings := paygent.UsageDataWithStrings{
-			ServiceProvider: params.Model,
+			ServiceProvider: paygent.Anthropic,
 			Model:           params.Model,
 			PromptString:    string(promptString),
 			OutputString:    outputString,

@@ -38,463 +38,54 @@ type UsageDataWithStrings struct {
 	OutputString    string `json:"output_string"`
 }
 
-// APIRequest represents the request body for the API call
-type APIRequest struct {
-	AgentID         string  `json:"agentId"`
-	CustomerID      string  `json:"customerId"`
-	Indicator       string  `json:"indicator"`
-	Amount          float64 `json:"amount"`
-	InputToken      int     `json:"inputToken"`
-	OutputToken     int     `json:"outputToken"`
-	Model           string  `json:"model"`
-	ServiceProvider string  `json:"serviceProvider"`
+// RawUsageData represents raw usage data for V2 API
+type RawUsageData struct {
+	Provider       string `json:"provider"`
+	Model          string `json:"model"`
+	InputTokens    int    `json:"inputTokens"`
+	OutputTokens   int    `json:"outputTokens"`
+	CachedTokens   int    `json:"cachedTokens"`
+	AudioDuration  int    `json:"audioDuration"`
+	CharacterCount int    `json:"characterCount"`
 }
 
-// ModelPricing represents pricing information for different models
-type ModelPricing struct {
-	PromptTokensCost     float64
-	CompletionTokensCost float64
+// CostBreakdown represents the cost breakdown in V2 response
+type CostBreakdown struct {
+	PromptCost     float64 `json:"promptCost"`
+	CompletionCost float64 `json:"completionCost"`
+	TotalCost      float64 `json:"totalCost"`
 }
 
-// Default model pricing (cost per 1000 tokens in USD)
-var modelPricing = map[string]ModelPricing{
-	// OpenAI Models (pricing per 1000 tokens)
-	GPT5: {
-		PromptTokensCost:     0.00125, // $0.00125 per 1000 tokens
-		CompletionTokensCost: 0.01,    // $0.01 per 1000 tokens
-	},
-	GPT5Mini: {
-		PromptTokensCost:     0.00025, // $0.00025 per 1000 tokens
-		CompletionTokensCost: 0.002,   // $0.002 per 1000 tokens
-	},
-	GPT5Nano: {
-		PromptTokensCost:     0.00005, // $0.00005 per 1000 tokens
-		CompletionTokensCost: 0.0004,  // $0.0004 per 1000 tokens
-	},
-	GPT5ChatLatest: {
-		PromptTokensCost:     0.00125, // $0.00125 per 1000 tokens
-		CompletionTokensCost: 0.01,    // $0.01 per 1000 tokens
-	},
-	GPT5Codex: {
-		PromptTokensCost:     0.00125, // $0.00125 per 1000 tokens
-		CompletionTokensCost: 0.01,    // $0.01 per 1000 tokens
-	},
-	GPT5Pro: {
-		PromptTokensCost:     0.015, // $0.015 per 1000 tokens
-		CompletionTokensCost: 0.12,  // $0.12 per 1000 tokens
-	},
-	GPT5SearchAPI: {
-		PromptTokensCost:     0.00125, // $0.00125 per 1000 tokens
-		CompletionTokensCost: 0.01,    // $0.01 per 1000 tokens
-	},
-	GPT41: {
-		PromptTokensCost:     0.002, // $0.002 per 1000 tokens
-		CompletionTokensCost: 0.008, // $0.008 per 1000 tokens
-	},
-	GPT41Mini: {
-		PromptTokensCost:     0.0004, // $0.0004 per 1000 tokens
-		CompletionTokensCost: 0.0016, // $0.0016 per 1000 tokens
-	},
-	GPT41Nano: {
-		PromptTokensCost:     0.0001, // $0.0001 per 1000 tokens
-		CompletionTokensCost: 0.0004, // $0.0004 per 1000 tokens
-	},
-	GPT4O: {
-		PromptTokensCost:     0.0025, // $0.0025 per 1000 tokens
-		CompletionTokensCost: 0.01,   // $0.01 per 1000 tokens
-	},
-	GPT4O20240513: {
-		PromptTokensCost:     0.005, // $0.005 per 1000 tokens
-		CompletionTokensCost: 0.015, // $0.015 per 1000 tokens
-	},
-	GPT4OMini: {
-		PromptTokensCost:     0.00015, // $0.00015 per 1000 tokens
-		CompletionTokensCost: 0.0006,  // $0.0006 per 1000 tokens
-	},
-	GPTRealtime: {
-		PromptTokensCost:     0.004, // $0.004 per 1000 tokens
-		CompletionTokensCost: 0.016, // $0.016 per 1000 tokens
-	},
-	GPTRealtimeMini: {
-		PromptTokensCost:     0.0006, // $0.0006 per 1000 tokens
-		CompletionTokensCost: 0.0024, // $0.0024 per 1000 tokens
-	},
-	GPT4ORealtimePreview: {
-		PromptTokensCost:     0.005, // $0.005 per 1000 tokens
-		CompletionTokensCost: 0.02,  // $0.02 per 1000 tokens
-	},
-	GPT4OMiniRealtimePreview: {
-		PromptTokensCost:     0.0006, // $0.0006 per 1000 tokens
-		CompletionTokensCost: 0.0024, // $0.0024 per 1000 tokens
-	},
-	GPTAudio: {
-		PromptTokensCost:     0.0025, // $0.0025 per 1000 tokens
-		CompletionTokensCost: 0.01,   // $0.01 per 1000 tokens
-	},
-	GPTAudioMini: {
-		PromptTokensCost:     0.0006, // $0.0006 per 1000 tokens
-		CompletionTokensCost: 0.0024, // $0.0024 per 1000 tokens
-	},
-	GPT4OAudioPreview: {
-		PromptTokensCost:     0.0025, // $0.0025 per 1000 tokens
-		CompletionTokensCost: 0.01,   // $0.01 per 1000 tokens
-	},
-	GPT4OMiniAudioPreview: {
-		PromptTokensCost:     0.00015, // $0.00015 per 1000 tokens
-		CompletionTokensCost: 0.0006,  // $0.0006 per 1000 tokens
-	},
-	O1: {
-		PromptTokensCost:     0.015, // $0.015 per 1000 tokens
-		CompletionTokensCost: 0.06,  // $0.06 per 1000 tokens
-	},
-	O1Pro: {
-		PromptTokensCost:     0.15, // $0.15 per 1000 tokens
-		CompletionTokensCost: 0.6,  // $0.6 per 1000 tokens
-	},
-	O3Pro: {
-		PromptTokensCost:     0.02, // $0.02 per 1000 tokens
-		CompletionTokensCost: 0.08, // $0.08 per 1000 tokens
-	},
-	O3: {
-		PromptTokensCost:     0.002, // $0.002 per 1000 tokens
-		CompletionTokensCost: 0.008, // $0.008 per 1000 tokens
-	},
-	O3DeepResearch: {
-		PromptTokensCost:     0.01, // $0.01 per 1000 tokens
-		CompletionTokensCost: 0.04, // $0.04 per 1000 tokens
-	},
-	O4Mini: {
-		PromptTokensCost:     0.0011, // $0.0011 per 1000 tokens
-		CompletionTokensCost: 0.0044, // $0.0044 per 1000 tokens
-	},
-	O4MiniDeepResearch: {
-		PromptTokensCost:     0.002, // $0.002 per 1000 tokens
-		CompletionTokensCost: 0.008, // $0.008 per 1000 tokens
-	},
-	O3Mini: {
-		PromptTokensCost:     0.0011, // $0.0011 per 1000 tokens
-		CompletionTokensCost: 0.0044, // $0.0044 per 1000 tokens
-	},
-	O1Mini: {
-		PromptTokensCost:     0.0011, // $0.0011 per 1000 tokens
-		CompletionTokensCost: 0.0044, // $0.0044 per 1000 tokens
-	},
-	CodexMiniLatest: {
-		PromptTokensCost:     0.0015, // $0.0015 per 1000 tokens
-		CompletionTokensCost: 0.006,  // $0.006 per 1000 tokens
-	},
-	GPT4OMiniSearchPreview: {
-		PromptTokensCost:     0.00015, // $0.00015 per 1000 tokens
-		CompletionTokensCost: 0.0006,  // $0.0006 per 1000 tokens
-	},
-	GPT4OSearchPreview: {
-		PromptTokensCost:     0.0025, // $0.0025 per 1000 tokens
-		CompletionTokensCost: 0.01,   // $0.01 per 1000 tokens
-	},
-	ComputerUsePreview: {
-		PromptTokensCost:     0.003, // $0.003 per 1000 tokens
-		CompletionTokensCost: 0.012, // $0.012 per 1000 tokens
-	},
-	ChatGPT4OLatest: {
-		PromptTokensCost:     0.005, // $0.005 per 1000 tokens
-		CompletionTokensCost: 0.015, // $0.015 per 1000 tokens
-	},
-	GPT4Turbo20240409: {
-		PromptTokensCost:     0.01, // $0.01 per 1000 tokens
-		CompletionTokensCost: 0.03, // $0.03 per 1000 tokens
-	},
-	GPT40125Preview: {
-		PromptTokensCost:     0.01, // $0.01 per 1000 tokens
-		CompletionTokensCost: 0.03, // $0.03 per 1000 tokens
-	},
-	GPT41106Preview: {
-		PromptTokensCost:     0.01, // $0.01 per 1000 tokens
-		CompletionTokensCost: 0.03, // $0.03 per 1000 tokens
-	},
-	GPT41106VisionPreview: {
-		PromptTokensCost:     0.01, // $0.01 per 1000 tokens
-		CompletionTokensCost: 0.03, // $0.03 per 1000 tokens
-	},
-	GPT40613: {
-		PromptTokensCost:     0.03, // $0.03 per 1000 tokens
-		CompletionTokensCost: 0.06, // $0.06 per 1000 tokens
-	},
-	GPT40314: {
-		PromptTokensCost:     0.03, // $0.03 per 1000 tokens
-		CompletionTokensCost: 0.06, // $0.06 per 1000 tokens
-	},
-	GPT432K: {
-		PromptTokensCost:     0.06, // $0.06 per 1000 tokens
-		CompletionTokensCost: 0.12, // $0.12 per 1000 tokens
-	},
-	GPT35Turbo: {
-		PromptTokensCost:     0.0005, // $0.0005 per 1000 tokens
-		CompletionTokensCost: 0.0015, // $0.0015 per 1000 tokens
-	},
-	GPT35Turbo0125: {
-		PromptTokensCost:     0.0005, // $0.0005 per 1000 tokens
-		CompletionTokensCost: 0.0015, // $0.0015 per 1000 tokens
-	},
-	GPT35Turbo1106: {
-		PromptTokensCost:     0.001, // $0.001 per 1000 tokens
-		CompletionTokensCost: 0.002, // $0.002 per 1000 tokens
-	},
-	GPT35Turbo0613: {
-		PromptTokensCost:     0.0015, // $0.0015 per 1000 tokens
-		CompletionTokensCost: 0.002,  // $0.002 per 1000 tokens
-	},
-	GPT350301: {
-		PromptTokensCost:     0.0015, // $0.0015 per 1000 tokens
-		CompletionTokensCost: 0.002,  // $0.002 per 1000 tokens
-	},
-	GPT35TurboInstruct: {
-		PromptTokensCost:     0.0015, // $0.0015 per 1000 tokens
-		CompletionTokensCost: 0.002,  // $0.002 per 1000 tokens
-	},
-	GPT35Turbo16K0613: {
-		PromptTokensCost:     0.003, // $0.003 per 1000 tokens
-		CompletionTokensCost: 0.004, // $0.004 per 1000 tokens
-	},
-	Davinci002: {
-		PromptTokensCost:     0.002, // $0.002 per 1000 tokens
-		CompletionTokensCost: 0.002, // $0.002 per 1000 tokens
-	},
-	Babbage002: {
-		PromptTokensCost:     0.0004, // $0.0004 per 1000 tokens
-		CompletionTokensCost: 0.0004, // $0.0004 per 1000 tokens
-	},
-
-	// Anthropic Models (pricing per 1000 tokens)
-	Sonnet45: {
-		PromptTokensCost:     0.003, // $0.003 per 1000 tokens
-		CompletionTokensCost: 0.015, // $0.015 per 1000 tokens
-	},
-	Haiku45: {
-		PromptTokensCost:     0.001, // $0.001 per 1000 tokens
-		CompletionTokensCost: 0.005, // $0.005 per 1000 tokens
-	},
-	Opus41: {
-		PromptTokensCost:     0.015, // $0.015 per 1000 tokens
-		CompletionTokensCost: 0.075, // $0.075 per 1000 tokens
-	},
-	Sonnet4: {
-		PromptTokensCost:     0.003, // $0.003 per 1000 tokens
-		CompletionTokensCost: 0.015, // $0.015 per 1000 tokens
-	},
-	Opus4: {
-		PromptTokensCost:     0.015, // $0.015 per 1000 tokens
-		CompletionTokensCost: 0.075, // $0.075 per 1000 tokens
-	},
-	Sonnet37: {
-		PromptTokensCost:     0.003, // $0.003 per 1000 tokens
-		CompletionTokensCost: 0.015, // $0.015 per 1000 tokens
-	},
-	Haiku35: {
-		PromptTokensCost:     0.0008, // $0.0008 per 1000 tokens
-		CompletionTokensCost: 0.004,  // $0.004 per 1000 tokens
-	},
-	Opus3: {
-		PromptTokensCost:     0.015, // $0.015 per 1000 tokens
-		CompletionTokensCost: 0.075, // $0.075 per 1000 tokens
-	},
-	Haiku3: {
-		PromptTokensCost:     0.00025, // $0.00025 per 1000 tokens
-		CompletionTokensCost: 0.00125, // $0.00125 per 1000 tokens
-	},
-
-	// Google DeepMind Models (pricing per 1000 tokens)
-	Gemini25Pro: {
-		PromptTokensCost:     0.00125, // $0.00125 per 1000 tokens
-		CompletionTokensCost: 0.01,    // $0.01 per 1000 tokens
-	},
-	Gemini25Flash: {
-		PromptTokensCost:     0.00015, // $0.00015 per 1000 tokens
-		CompletionTokensCost: 0.0006,  // $0.0006 per 1000 tokens
-	},
-	Gemini25FlashPreview: {
-		PromptTokensCost:     0.3, // $0.30 per 1000 tokens
-		CompletionTokensCost: 2.5, // $2.50 per 1000 tokens
-	},
-	Gemini25FlashLite: {
-		PromptTokensCost:     0.0001, // $0.0001 per 1000 tokens
-		CompletionTokensCost: 0.0004, // $0.0004 per 1000 tokens
-	},
-	Gemini25FlashLitePreview: {
-		PromptTokensCost:     0.0001, // $0.0001 per 1000 tokens
-		CompletionTokensCost: 0.0004, // $0.0004 per 1000 tokens
-	},
-	Gemini25FlashNativeAudio: {
-		PromptTokensCost:     0.0005, // $0.0005 per 1000 tokens
-		CompletionTokensCost: 0.002,  // $0.002 per 1000 tokens
-	},
-	Gemini25FlashImage: {
-		PromptTokensCost:     0.0003, // $0.0003 per 1000 tokens
-		CompletionTokensCost: 0.03,   // $0.03 per 1000 tokens
-	},
-	Gemini25FlashPreviewTTS: {
-		PromptTokensCost:     0.0005, // $0.0005 per 1000 tokens
-		CompletionTokensCost: 0.01,   // $0.01 per 1000 tokens
-	},
-	Gemini25ProPreviewTTS: {
-		PromptTokensCost:     0.001, // $0.001 per 1000 tokens
-		CompletionTokensCost: 0.02,  // $0.02 per 1000 tokens
-	},
-	Gemini25ComputerUsePreview: {
-		PromptTokensCost:     0.00125, // $0.00125 per 1000 tokens
-		CompletionTokensCost: 0.01,    // $0.01 per 1000 tokens
-	},
-
-	// Meta Models (pricing per 1000 tokens)
-	Llama4Maverick: {
-		PromptTokensCost:     0.00027, // $0.00027 per 1000 tokens
-		CompletionTokensCost: 0.00085, // $0.00085 per 1000 tokens
-	},
-	Llama4Scout: {
-		PromptTokensCost:     0.00018, // $0.00018 per 1000 tokens
-		CompletionTokensCost: 0.00059, // $0.00059 per 1000 tokens
-	},
-	Llama3370BInstructTurbo: {
-		PromptTokensCost:     0.00088, // $0.00088 per 1000 tokens
-		CompletionTokensCost: 0.00088, // $0.00088 per 1000 tokens
-	},
-	Llama323BInstructTurbo: {
-		PromptTokensCost:     0.00006, // $0.00006 per 1000 tokens
-		CompletionTokensCost: 0.00006, // $0.00006 per 1000 tokens
-	},
-	Llama31405BInstructTurbo: {
-		PromptTokensCost:     0.0035, // $0.0035 per 1000 tokens
-		CompletionTokensCost: 0.0035, // $0.0035 per 1000 tokens
-	},
-	Llama3170BInstructTurbo: {
-		PromptTokensCost:     0.00088, // $0.00088 per 1000 tokens
-		CompletionTokensCost: 0.00088, // $0.00088 per 1000 tokens
-	},
-	Llama318BInstructTurbo: {
-		PromptTokensCost:     0.00018, // $0.00018 per 1000 tokens
-		CompletionTokensCost: 0.00018, // $0.00018 per 1000 tokens
-	},
-	Llama370BInstructTurbo: {
-		PromptTokensCost:     0.00088, // $0.00088 per 1000 tokens
-		CompletionTokensCost: 0.00088, // $0.00088 per 1000 tokens
-	},
-	Llama370BInstructReference: {
-		PromptTokensCost:     0.00088, // $0.00088 per 1000 tokens
-		CompletionTokensCost: 0.00088, // $0.00088 per 1000 tokens
-	},
-	Llama38BInstructLite: {
-		PromptTokensCost:     0.0001, // $0.0001 per 1000 tokens
-		CompletionTokensCost: 0.0001, // $0.0001 per 1000 tokens
-	},
-	LLaMA2: {
-		PromptTokensCost:     0.0009, // $0.0009 per 1000 tokens
-		CompletionTokensCost: 0.0009, // $0.0009 per 1000 tokens
-	},
-	LlamaGuard412B: {
-		PromptTokensCost:     0.0002, // $0.0002 per 1000 tokens
-		CompletionTokensCost: 0.0002, // $0.0002 per 1000 tokens
-	},
-	LlamaGuard311BVisionTurbo: {
-		PromptTokensCost:     0.00018, // $0.00018 per 1000 tokens
-		CompletionTokensCost: 0.00018, // $0.00018 per 1000 tokens
-	},
-	LlamaGuard38B: {
-		PromptTokensCost:     0.0002, // $0.0002 per 1000 tokens
-		CompletionTokensCost: 0.0002, // $0.0002 per 1000 tokens
-	},
-	LlamaGuard28B: {
-		PromptTokensCost:     0.0002, // $0.0002 per 1000 tokens
-		CompletionTokensCost: 0.0002, // $0.0002 per 1000 tokens
-	},
-	SalesforceLlamaRankV18B: {
-		PromptTokensCost:     0.0001, // $0.0001 per 1000 tokens
-		CompletionTokensCost: 0.0001, // $0.0001 per 1000 tokens
-	},
-
-	// AWS Models (pricing per 1000 tokens)
-	AmazonNovaMicro: {
-		PromptTokensCost:     0.035, // $0.035 per 1000 tokens
-		CompletionTokensCost: 0.14,  // $0.14 per 1000 tokens
-	},
-	AmazonNovaLite: {
-		PromptTokensCost:     0.06, // $0.06 per 1000 tokens
-		CompletionTokensCost: 0.24, // $0.24 per 1000 tokens
-	},
-	AmazonNovaPro: {
-		PromptTokensCost:     0.8, // $0.8 per 1000 tokens
-		CompletionTokensCost: 3.2, // $3.2 per 1000 tokens
-	},
-
-	// Mistral AI Models (pricing per 1000 tokens)
-	Mistral7BInstruct: {
-		PromptTokensCost:     0.028, // $0.028 per 1000 tokens
-		CompletionTokensCost: 0.054, // $0.054 per 1000 tokens
-	},
-	MistralLarge: {
-		PromptTokensCost:     2.0, // $2.00 per 1000 tokens
-		CompletionTokensCost: 6.0, // $6.00 per 1000 tokens
-	},
-	MistralSmall: {
-		PromptTokensCost:     0.2, // $0.20 per 1000 tokens
-		CompletionTokensCost: 0.6, // $0.60 per 1000 tokens
-	},
-	MistralMedium: {
-		PromptTokensCost:     0.4, // $0.40 per 1000 tokens
-		CompletionTokensCost: 2.0, // $2.00 per 1000 tokens
-	},
-
-	// Cohere Models (pricing per 1000 tokens)
-	CommandR7B: {
-		PromptTokensCost:     0.0000375, // $0.0000375 per 1000 tokens
-		CompletionTokensCost: 0.00015,   // $0.00015 per 1000 tokens
-	},
-	CommandR: {
-		PromptTokensCost:     0.00015, // $0.00015 per 1000 tokens
-		CompletionTokensCost: 0.0006,  // $0.0006 per 1000 tokens
-	},
-	CommandRPlus: {
-		PromptTokensCost:     0.00250, // $0.00250 per 1000 tokens
-		CompletionTokensCost: 0.01,    // $0.01 per 1000 tokens
-	},
-	CommandA: {
-		PromptTokensCost:     0.001, // $0.001 per 1000 tokens
-		CompletionTokensCost: 0.002, // $0.002 per 1000 tokens
-	},
-	AyaExpanse8B32B: {
-		PromptTokensCost:     0.00050, // $0.00050 per 1000 tokens
-		CompletionTokensCost: 0.00150, // $0.00150 per 1000 tokens
-	},
-
-	// DeepSeek Models (pricing per 1000 tokens)
-	DeepSeekChat: {
-		PromptTokensCost:     0.00007, // $0.00007 per 1000 tokens
-		CompletionTokensCost: 0.00027, // $0.00027 per 1000 tokens
-	},
-	DeepSeekReasoner: {
-		PromptTokensCost:     0.00014, // $0.00014 per 1000 tokens
-		CompletionTokensCost: 0.00219, // $0.00219 per 1000 tokens
-	},
-	DeepSeekR1Global: {
-		PromptTokensCost:     0.00135, // $0.00135 per 1000 tokens
-		CompletionTokensCost: 0.0054,  // $0.0054 per 1000 tokens
-	},
-	DeepSeekR1DataZone: {
-		PromptTokensCost:     0.001485, // $0.001485 per 1000 tokens
-		CompletionTokensCost: 0.00594,  // $0.00594 per 1000 tokens
-	},
-	DeepSeekV32Exp: {
-		PromptTokensCost:     0.000028, // $0.000028 per 1000 tokens
-		CompletionTokensCost: 0.00042,  // $0.00042 per 1000 tokens
-	},
+// SendUsageV2Response represents the response from V2 usage API
+type SendUsageV2Response struct {
+	CPDataID       string        `json:"cpDataId"`
+	CalculatedCost float64       `json:"calculatedCost"`
+	Breakdown      CostBreakdown `json:"breakdown"`
 }
 
-// SDK configuration constants - locked and cannot be changed by users
+// Customer represents a customer in Paygent
+type Customer struct {
+	ID         string `json:"id"`
+	ExternalID string `json:"externalId"`
+	Name       string `json:"name"`
+	Email      string `json:"email,omitempty"`
+}
+
+// CustomerCreateOrGetRequest represents the request to create or get a customer
+type CustomerCreateOrGetRequest struct {
+	ExternalID string `json:"externalId"`
+	Name       string `json:"name"`
+	Email      string `json:"email,omitempty"`
+}
+
+
 const (
 	defaultBaseURL = "https://cp-api.withpaygent.com"
-	// defaultBaseURL = "http://localhost:8082" // For local development
+	// defaultBaseURL = "http://localhost:8082"
 	defaultTimeout = 30 * time.Second
 )
 
-// NewClient creates a new Paygent SDK client
+// NewClient creates a new Paygent SDK client with default production URL
 func NewClient(apiKey string) *Client {
 	logger := logrus.New()
 	// Set to ERROR level for minimal logging - only log errors
@@ -507,30 +98,6 @@ func NewClient(apiKey string) *Client {
 		logger:     logger,
 	}
 }
-
-// calculateCost calculates the cost based on model and usage data
-func (c *Client) calculateCost(model string, usageData UsageData) (float64, error) {
-	pricing, exists := modelPricing[model]
-	if !exists {
-		c.logger.Warnf("Unknown model '%s', using default pricing", model)
-		// Use default pricing for unknown models (per 1000 tokens)
-		pricing = ModelPricing{
-			PromptTokensCost:     0.1, // $0.10 per 1000 tokens
-			CompletionTokensCost: 0.1, // $0.10 per 1000 tokens
-		}
-	}
-
-	// Calculate cost per 1000 tokens
-	promptCost := (float64(usageData.PromptTokens) / 1000.0) * pricing.PromptTokensCost
-	completionCost := (float64(usageData.CompletionTokens) / 1000.0) * pricing.CompletionTokensCost
-	totalCost := promptCost + completionCost
-
-	c.logger.Debugf("Cost calculation for model '%s': prompt_tokens=%d (%.6f), completion_tokens=%d (%.6f), total=%.6f",
-		model, usageData.PromptTokens, promptCost, usageData.CompletionTokens, completionCost, totalCost)
-
-	return totalCost, nil
-}
-
 // getTokenCount estimates tokens for a given model and text
 // Supports OpenAI, Anthropic, Google, Meta, AWS, Mistral, Cohere, DeepSeek
 func (c *Client) getTokenCount(model, text string) int {
@@ -647,187 +214,111 @@ func (c *Client) fallbackTokenCount(text string) int {
 	return int(float64(words) * 1.3)
 }
 
-// calculateCostFromStrings calculates the cost based on model and text strings
-func (c *Client) calculateCostFromStrings(model string, usageData UsageDataWithStrings) (float64, error) {
-	pricing, exists := modelPricing[model]
-	if !exists {
-		c.logger.Warnf("Unknown model '%s', using default pricing", model)
-		// Use default pricing for unknown models (per 1000 tokens)
-		pricing = ModelPricing{
-			PromptTokensCost:     0.1, // $0.10 per 1000 tokens
-			CompletionTokensCost: 0.1, // $0.10 per 1000 tokens
-		}
+// SendUsageV2 sends usage data to the Paygent V2 API
+func (c *Client) SendUsageV2(agentID, customerID, indicator string, usageData RawUsageData) (*SendUsageV2Response, error) {
+	requestData := map[string]interface{}{
+		"agentId":    agentID,
+		"customerId": customerID,
+		"indicator":  indicator,
+		"rawUsage":   usageData,
 	}
 
-	// Count tokens from strings using proper tokenization
-	promptTokens := c.getTokenCount(usageData.Model, usageData.PromptString)
-	completionTokens := c.getTokenCount(usageData.Model, usageData.OutputString)
+	requestBody, err := json.Marshal(requestData)
+	if err != nil {
+		c.logger.Errorf("Failed to marshal request body: %v", err)
+		return nil, fmt.Errorf("failed to marshal request body: %w", err)
+	}
 
-	// Calculate cost per 1000 tokens
-	promptCost := (float64(promptTokens) / 1000.0) * pricing.PromptTokensCost
-	completionCost := (float64(completionTokens) / 1000.0) * pricing.CompletionTokensCost
-	totalCost := promptCost + completionCost
+	url := fmt.Sprintf("%s/api/v2/usage", c.baseURL)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
 
-	c.logger.Debugf("Cost calculation for model '%s' from strings: prompt_tokens=%d (%.6f), completion_tokens=%d (%.6f), total=%.6f",
-		model, promptTokens, promptCost, completionTokens, completionCost, totalCost)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("paygent-api-key", c.apiKey)
 
-	return totalCost, nil
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	responseBody, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("api request failed with status %d: %s", resp.StatusCode, string(responseBody))
+	}
+
+	var v2Response SendUsageV2Response
+	if err := json.Unmarshal(responseBody, &v2Response); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	return &v2Response, nil
 }
 
-// SendUsage sends usage data to the Paygent API
+// CreateOrGetCustomer creates or gets a customer in Paygent
+func (c *Client) CreateOrGetCustomer(customerData CustomerCreateOrGetRequest) (*Customer, error) {
+	requestBody, err := json.Marshal(customerData)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	url := fmt.Sprintf("%s/api/v1/customers/create-or-get", c.baseURL)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("paygent-api-key", c.apiKey)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+	defer resp.Body.Close()
+
+	responseBody, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("api request failed with status %d: %s", resp.StatusCode, string(responseBody))
+	}
+
+	var customer Customer
+	if err := json.Unmarshal(responseBody, &customer); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	return &customer, nil
+}
+
+// SendUsage sends usage data to the Paygent API (Legacy)
 func (c *Client) SendUsage(agentID, customerID, indicator string, usageData UsageData) error {
-	// Removed verbose logging - only log errors
-
-	// Calculate cost
-	cost, err := c.calculateCost(usageData.Model, usageData)
-	if err != nil {
-		c.logger.Errorf("Failed to calculate cost: %v", err)
-		return fmt.Errorf("failed to calculate cost: %w", err)
+	rawUsage := RawUsageData{
+		Provider:     usageData.ServiceProvider,
+		Model:        usageData.Model,
+		InputTokens:  usageData.PromptTokens,
+		OutputTokens: usageData.CompletionTokens,
 	}
 
-	// Cost calculated (no logging for performance)
-
-	// Prepare API request
-	apiRequest := APIRequest{
-		AgentID:         agentID,
-		CustomerID:      customerID,
-		Indicator:       indicator,
-		Amount:          cost,
-		InputToken:      usageData.PromptTokens,
-		OutputToken:     usageData.CompletionTokens,
-		Model:           usageData.Model,
-		ServiceProvider: usageData.ServiceProvider,
-	}
-
-	// Marshal request body
-	requestBody, err := json.Marshal(apiRequest)
-	if err != nil {
-		c.logger.Errorf("Failed to marshal request body: %v", err)
-		return fmt.Errorf("failed to marshal request body: %w", err)
-	}
-
-	c.logger.Debugf("API request body: %s", string(requestBody))
-
-	// Create HTTP request
-	url := fmt.Sprintf("%s/api/v1/usage", c.baseURL)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
-	if err != nil {
-		c.logger.Errorf("Failed to create HTTP request: %v", err)
-		return fmt.Errorf("failed to create HTTP request: %w", err)
-	}
-
-	// Set headers
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("paygent-api-key", c.apiKey)
-
-	c.logger.Debugf("Making HTTP POST request to: %s", url)
-
-	// Make HTTP request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		c.logger.Errorf("HTTP request failed: %v", err)
-		return fmt.Errorf("HTTP request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Read response body
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		c.logger.Errorf("Failed to read response body: %v", err)
-		return fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	c.logger.Debugf("API response status: %d, body: %s", resp.StatusCode, string(responseBody))
-
-	// Check response status
-	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		// Success - no logging to minimize verbosity
-		return nil
-	}
-
-	// Handle error response
-	c.logger.Errorf("API request failed with status %d: %s", resp.StatusCode, string(responseBody))
-	return fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(responseBody))
+	_, err := c.SendUsageV2(agentID, customerID, indicator, rawUsage)
+	return err
 }
 
-// SendUsageWithTokenString sends usage data to the Paygent API using prompt and output strings
+// SendUsageWithTokenString sends usage data to the Paygent API using prompt and output strings (Legacy)
 func (c *Client) SendUsageWithTokenString(agentID, customerID, indicator string, usageData UsageDataWithStrings) error {
-	// Removed verbose logging - only log errors
-
-	// Calculate cost from strings
-	cost, err := c.calculateCostFromStrings(usageData.Model, usageData)
-	if err != nil {
-		c.logger.Errorf("Failed to calculate cost from strings: %v", err)
-		return fmt.Errorf("failed to calculate cost from strings: %w", err)
-	}
-
-	// Cost calculated from strings (no logging for performance)
-
-	// Count tokens from strings using proper tokenization
 	promptTokens := c.getTokenCount(usageData.Model, usageData.PromptString)
 	completionTokens := c.getTokenCount(usageData.Model, usageData.OutputString)
 
-	// Prepare API request
-	apiRequest := APIRequest{
-		AgentID:         agentID,
-		CustomerID:      customerID,
-		Indicator:       indicator,
-		Amount:          cost,
-		InputToken:      promptTokens,
-		OutputToken:     completionTokens,
-		Model:           usageData.Model,
-		ServiceProvider: usageData.ServiceProvider,
+	rawUsage := RawUsageData{
+		Provider:     usageData.ServiceProvider,
+		Model:        usageData.Model,
+		InputTokens:  promptTokens,
+		OutputTokens: completionTokens,
 	}
 
-	// Marshal request body
-	requestBody, err := json.Marshal(apiRequest)
-	if err != nil {
-		c.logger.Errorf("Failed to marshal request body: %v", err)
-		return fmt.Errorf("failed to marshal request body: %w", err)
-	}
-
-	c.logger.Debugf("API request body: %s", string(requestBody))
-
-	// Create HTTP request
-	url := fmt.Sprintf("%s/api/v1/usage", c.baseURL)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
-	if err != nil {
-		c.logger.Errorf("Failed to create HTTP request: %v", err)
-		return fmt.Errorf("failed to create HTTP request: %w", err)
-	}
-
-	// Set headers
-	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("paygent-api-key", c.apiKey)
-
-	c.logger.Debugf("Making HTTP POST request to: %s", url)
-
-	// Make HTTP request
-	resp, err := c.httpClient.Do(req)
-	if err != nil {
-		c.logger.Errorf("HTTP request failed: %v", err)
-		return fmt.Errorf("HTTP request failed: %w", err)
-	}
-	defer resp.Body.Close()
-
-	// Read response body
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		c.logger.Errorf("Failed to read response body: %v", err)
-		return fmt.Errorf("failed to read response body: %w", err)
-	}
-
-	c.logger.Debugf("API response status: %d, body: %s", resp.StatusCode, string(responseBody))
-
-	// Check response status
-	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		// Success - no logging to minimize verbosity
-		return nil
-	}
-
-	// Handle error response
-	c.logger.Errorf("API request failed with status %d: %s", resp.StatusCode, string(responseBody))
-	return fmt.Errorf("API request failed with status %d: %s", resp.StatusCode, string(responseBody))
+	_, err := c.SendUsageV2(agentID, customerID, indicator, rawUsage)
+	return err
 }
 
 // SetLogLevel sets the logging level for the client

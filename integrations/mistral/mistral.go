@@ -60,7 +60,7 @@ func (p *PaygentMistral) ChatComplete(ctx context.Context, params MistralChatPar
 	if hasValidUsage {
 		// Primary path: Use usage data from API response
 		usageData := paygent.UsageData{
-			ServiceProvider:  params.Model,
+			ServiceProvider:  paygent.MistralAI,
 			Model:            params.Model,
 			PromptTokens:     resp.Usage.PromptTokens,
 			CompletionTokens: resp.Usage.CompletionTokens,
@@ -85,7 +85,7 @@ func (p *PaygentMistral) ChatComplete(ctx context.Context, params MistralChatPar
 		}
 
 		usageDataWithStrings := paygent.UsageDataWithStrings{
-			ServiceProvider: params.Model,
+			ServiceProvider: paygent.MistralAI,
 			Model:           params.Model,
 			PromptString:    string(promptString),
 			OutputString:    outputString,
