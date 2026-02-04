@@ -28,6 +28,7 @@ type UsageData struct {
 	PromptTokens     int    `json:"prompt_tokens"`
 	CompletionTokens int    `json:"completion_tokens"`
 	TotalTokens      int    `json:"total_tokens"`
+	Plan             string `json:"plan"`
 }
 
 // UsageDataWithStrings represents the usage data structure with prompt and output strings
@@ -36,6 +37,7 @@ type UsageDataWithStrings struct {
 	Model           string `json:"model"`
 	PromptString    string `json:"prompt_string"`
 	OutputString    string `json:"output_string"`
+	Plan            string `json:"plan"`
 }
 
 // RawUsageData represents raw usage data for V2 API
@@ -47,6 +49,7 @@ type RawUsageData struct {
 	CachedTokens   int    `json:"cachedTokens"`
 	AudioDuration  int    `json:"audioDuration"`
 	CharacterCount int    `json:"characterCount"`
+	Plan           string `json:"plan"`
 }
 
 // CostBreakdown represents the cost breakdown in V2 response
@@ -222,6 +225,14 @@ func (c *Client) SendUsageV2(agentID, customerID, indicator string, usageData Ra
 		"indicator":  indicator,
 		"rawUsage":   usageData,
 	}
+	
+	// Ensure plan has a default
+	if usageData, ok := requestData["rawUsage"].(RawUsageData); ok {
+		if usageData.Plan == "" {
+			usageData.Plan = "default"
+		}
+		requestData["rawUsage"] = usageData
+	}
 
 	requestBody, err := json.Marshal(requestData)
 	if err != nil {
@@ -299,6 +310,7 @@ func (c *Client) SendUsage(agentID, customerID, indicator string, usageData Usag
 		Model:        usageData.Model,
 		InputTokens:  usageData.PromptTokens,
 		OutputTokens: usageData.CompletionTokens,
+		Plan:         usageData.Plan,
 	}
 
 	_, err := c.SendUsageV2(agentID, customerID, indicator, rawUsage)
@@ -315,6 +327,7 @@ func (c *Client) SendUsageWithTokenString(agentID, customerID, indicator string,
 		Model:        usageData.Model,
 		InputTokens:  promptTokens,
 		OutputTokens: completionTokens,
+		Plan:         usageData.Plan,
 	}
 
 	_, err := c.SendUsageV2(agentID, customerID, indicator, rawUsage)
