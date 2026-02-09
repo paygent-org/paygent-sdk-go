@@ -10,9 +10,10 @@ import (
 
 // SttUsageData represents the STT usage data structure
 type SttUsageData struct {
-	ServiceProvider string `json:"service_provider"`
-	Model           string `json:"model"`
+	ServiceProvider string  `json:"service_provider"`
+	Model           string  `json:"model"`
 	AudioDuration   float64 `json:"audio_duration"` // Duration in seconds
+	Plan            string  `json:"plan"`
 }
 
 // TtsUsageData represents the TTS usage data structure
@@ -20,6 +21,7 @@ type TtsUsageData struct {
 	ServiceProvider string `json:"service_provider"`
 	Model           string `json:"model"`
 	CharacterCount  int    `json:"character_count"` // Number of characters
+	Plan            string `json:"plan"`
 }
 
 // InitializeVoiceSession initializes a voice session
@@ -66,6 +68,7 @@ func (c *Client) TrackVoiceSTT(sessionID string, data map[string]interface{}) er
 		"audioMinutes": data["audioDuration"],
 		"provider":     data["serviceProvider"],
 		"model":        data["model"],
+		"plan":         data["plan"],
 		"language":     data["language"],
 	}
 
@@ -103,6 +106,7 @@ func (c *Client) TrackVoiceLLM(sessionID string, data map[string]interface{}) er
 		"sessionId":        sessionID,
 		"provider":         data["serviceProvider"],
 		"model":            data["model"],
+		"plan":             data["plan"],
 		"promptTokens":     data["promptTokens"],
 		"completionTokens": data["completionTokens"],
 	}
@@ -141,6 +145,7 @@ func (c *Client) TrackVoiceTTS(sessionID string, data map[string]interface{}) er
 		"sessionId":  sessionID,
 		"provider":   data["serviceProvider"],
 		"model":      data["model"],
+		"plan":       data["plan"],
 		"characters": data["characterCount"],
 	}
 
@@ -215,6 +220,7 @@ func (c *Client) SendSttUsage(agentID, customerID string, sttUsageData SttUsageD
 		Provider:      sttUsageData.ServiceProvider,
 		Model:         sttUsageData.Model,
 		AudioDuration: int(sttUsageData.AudioDuration),
+		Plan:          sttUsageData.Plan,
 	}
 
 	_, err := c.SendUsageV2(agentID, customerID, "stt-usage", rawUsage)
@@ -227,6 +233,7 @@ func (c *Client) SendTtsUsage(agentID, customerID string, ttsUsageData TtsUsageD
 		Provider:       ttsUsageData.ServiceProvider,
 		Model:          ttsUsageData.Model,
 		CharacterCount: ttsUsageData.CharacterCount,
+		Plan:           ttsUsageData.Plan,
 	}
 
 	_, err := c.SendUsageV2(agentID, customerID, "tts-usage", rawUsage)
