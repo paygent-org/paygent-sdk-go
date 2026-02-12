@@ -110,6 +110,10 @@ func (c *Client) TrackVoiceLLM(sessionID string, data map[string]interface{}) er
 		"promptTokens":     data["promptTokens"],
 		"completionTokens": data["completionTokens"],
 	}
+	// Optional: cached prompt tokens (for models with prompt caching, e.g. OpenAI, Anthropic)
+	if cached, ok := data["cachedTokens"]; ok && cached != nil {
+		requestData["cachedTokens"] = cached
+	}
 
 	requestBody, err := json.Marshal(requestData)
 	if err != nil {
